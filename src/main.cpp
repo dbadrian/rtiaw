@@ -18,7 +18,7 @@ Color ray_color(const Ray &r, const Hittable &world, int depth) {
 
   auto rec = world.hit(r, 0.001, INFINITY);
   if (rec) {
-    Point3 target = rec->p + rec->normal + random_in_unit_sphere();
+    Point3 target = rec->p + rec->normal + random_unit_vector();
     return 0.5 * ray_color(Ray(rec->p, target - rec->p), world, depth - 1);
   }
   Vec3 unit_direction = unit_vector(r.direction());
