@@ -134,6 +134,14 @@ inline Vec3 random_unit_vector() {
   return unit_vector(random_in_unit_sphere());
 }
 
+inline Vec3 random_in_hemisphere(const Vec3 &normal) {
+  auto in_unit_sphere = random_in_unit_sphere();
+  if (dot(in_unit_sphere, normal) > 0.0) // In the same hemisphere as the normal
+    return in_unit_sphere;
+  else
+    return -in_unit_sphere;
+}
+
 } // namespace rtiaw
 
 #endif
