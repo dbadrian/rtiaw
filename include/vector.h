@@ -148,6 +148,15 @@ inline Vec3 random_in_hemisphere(const Vec3 &normal) {
     return -in_unit_sphere;
 }
 
+inline Vec3 random_in_unit_disk() {
+  while (true) {
+    auto p = Vec3(rand_fp(-1.0, 1.0), rand_fp(-1.0, 1.0), 0.0);
+    if (p.length_squared() >= 1.0)
+      continue;
+    return p;
+  }
+}
+
 inline Vec3 reflect(const Vec3 &v, const Vec3 &n) {
   return v - 2 * dot(v, n) * n;
 }

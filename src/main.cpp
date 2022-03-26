@@ -1,5 +1,6 @@
 #include "camera.h"
 #include "color.h"
+#include "common.h"
 #include "hittable_list.h"
 #include "material.h"
 #include "random.h"
@@ -30,6 +31,52 @@ Color ray_color(const Ray &r, const Hittable &world, int depth) {
   return (1.0 - t) * Color(1.0, 1.0, 1.0) + t * Color(0.5, 0.7, 1.0); // NOLINT
 }
 
+HittableList random_scene() {
+  HittableList world;
+
+  auto ground_material = make_shared<Lambertian>(Color(0.5, 0.5, 0.5));
+  world.add(make_shared<Sphere>(Point3(0, -1000, 0), 1000, ground_material));
+
+  for (int a = -11; a < 11; a++) {
+    for (int b = -11; b < 11; b++) {
+      auto choose_mat = rand_fp();
+      Point3 center(a + 0.9 * rand_fp(), 0.2, b + 0.9 * rand_fp());
+
+      if ((center - Point3(4, 0.2, 0)).length() > 0.9) {
+        shared_ptr<Material> sphere_material;
+
+        if (choose_mat < 0.8) {
+          // diffuse
+          auto albedo = Color::random() * Color::random();
+          sphere_material = make_shared<Lambertian>(albedo);
+          world.add(make_shared<Sphere>(center, 0.2, sphere_material));
+        } else if (choose_mat < 0.95) {
+          // metal
+          auto albedo = Color::random(0.5, 1);
+          auto fuzz = rand_fp(0, 0.5);
+          sphere_material = make_shared<Metal>(albedo, fuzz);
+          world.add(make_shared<Sphere>(center, 0.2, sphere_material));
+        } else {
+          // glass
+          sphere_material = make_shared<Dielectric>(1.5);
+          world.add(make_shared<Sphere>(center, 0.2, sphere_material));
+        }
+      }
+    }
+  }
+
+  auto material1 = make_shared<Dielectric>(1.5);
+  world.add(make_shared<Sphere>(Point3(0, 1, 0), 1.0, material1));
+
+  auto material2 = make_shared<Lambertian>(Color(0.4, 0.2, 0.1));
+  world.add(make_shared<Sphere>(Point3(-4, 1, 0), 1.0, material2));
+
+  auto material3 = make_shared<Metal>(Color(0.7, 0.6, 0.5), 0.0);
+  world.add(make_shared<Sphere>(Point3(4, 1, 0), 1.0, material3));
+
+  return world;
+}
+
 int main(int argc, char *argv[]) {
 
   const auto args = std::span(argv, static_cast<std::size_t>(argc));
@@ -44,41 +91,38 @@ int main(int argc, char *argv[]) {
   }
 
   // World
-  HittableList world;
+  HittableList world = random_scene();
 
-  auto material_ground = make_shared<Lambertian>(Color(0.8, 0.8, 0.0));
-  auto material_center = make_shared<Lambertian>(Color(0.1, 0.2, 0.5));
-  auto material_left = make_shared<Dielectric>(1.5);
-  auto material_right = make_shared<Metal>(Color(0.8, 0.6, 0.2), 0.0);
+  Point3 lookfrom(13, 2, 3);
+  Point3 lookat(0, 0, 0);
+  Vec3 vup(0, 1, 0);
+  FPType dist_to_focus = 10.0;
+  FPType aperture = 0.1;
 
-  world.add(
-      make_shared<Sphere>(Point3(0.0, -100.5, -1.0), 100.0, material_ground));
-  world.add(make_shared<Sphere>(Point3(0.0, 0.0, -1.0), 0.5, material_center));
-  world.add(make_shared<Sphere>(Point3(-1.0, 0.0, -1.0), 0.5, material_left));
-  world.add(make_shared<Sphere>(Point3(-1.0, 0.0, -1.0), -0.45, material_left));
-  world.add(make_shared<Sphere>(Point3(1.0, 0.0, -1.0), 0.5, material_right));
-
-  Camera cam(Point3(-2, 2, 1), Point3(0, 0, -1), Vec3(0, 1, 0), 20,
-             ASPECT_RATIO);
+  Camera cam(lookfrom, lookat, vup, 20, ASPECT_RATIO, aperture, dist_to_focus);
 
   // Render
-
   std::cout << "P3\n" << IMAGE_WIDTH << ' ' << IMAGE_HEIGHT << "\n255\n";
 
-  for (int j = IMAGE_HEIGHT - 1; j >= 0; --j) {
-    std::cerr << "\rScanlines remaining: " << j << ' ' << std::flush;
+  Image image;
 
-    for (int i = 0; i < IMAGE_WIDTH; ++i) {
+  for (int row = IMAGE_HEIGHT - 1; row >= 0; --row) {
+    std::cerr << "\rScanlines remaining: " << row << ' ' << std::flush;
+
+    for (int col = 0; col < IMAGE_WIDTH; ++col) {
       Color pixel_color(0, 0, 0);
       for (int s = 0; s < num_samples; ++s) {
-        auto u = (static_cast<FPType>(i) + rand_fp()) / (IMAGE_WIDTH - 1);
-        auto v = (static_cast<FPType>(j) + rand_fp()) / (IMAGE_HEIGHT - 1);
+        auto u = (static_cast<FPType>(col) + rand_fp()) / (IMAGE_WIDTH - 1);
+        auto v = (static_cast<FPType>(row) + rand_fp()) / (IMAGE_HEIGHT - 1);
         Ray r = cam.get_ray(u, v);
         pixel_color += ray_color(r, world, max_depth);
       }
-      write_color(std::cout, pixel_color, num_samples);
+      // write_color(std::cout, pixel_color, num_samples);
+      image[row][col] = pixel_color;
     }
   }
+
+  write_color(std::cout, image, num_samples);
 
   // Finished succesfully
   return 0;
