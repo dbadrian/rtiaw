@@ -5,12 +5,12 @@
 
 namespace rtiaw {
 
-class Ray
-{
+class Ray {
 public:
   Ray() = default;
   // TODO(DBA): Strong-typed named arguments?
-  Ray(const Point3 &origin, const Vec3 &direction) : orig(origin), dir(direction) {}
+  Ray(const Point3 &origin, const Vec3 &direction) // NOLINT
+      : orig(origin), dir(direction) {}
 
   [[nodiscard]] Point3 origin() const { return orig; }
   [[nodiscard]] Vec3 direction() const { return dir; }
@@ -22,6 +22,6 @@ private:
   Vec3 dir;
 };
 
-}// namespace rtiaw
+} // namespace rtiaw
 
 #endif

@@ -1,7 +1,7 @@
 #ifndef CONSTANT_H
 #define CONSTANT_H
 
-#include <types>
+#include <limits>
 
 namespace rtiaw {
 
@@ -11,6 +11,6 @@ using FPType = FPPrecision;
 constexpr FPType INFINITY = std::numeric_limits<FPType>::infinity();
 constexpr FPType PI = 3.1415926535897932385;
 
-}// namespace rtiaw
+} // namespace rtiaw
 
-#endif// CONSTANT_H
+#endif // CONSTANT_H
