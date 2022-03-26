@@ -3,6 +3,7 @@
 
 #include "constant.h"
 
+#include <array>
 #include <cmath>
 #include <concepts>
 #include <iostream>
@@ -25,14 +26,14 @@ public:
   [[nodiscard]] T z() const { return e[2]; }
 
   Vector3 operator-() const { return Vector3(-e[0], -e[1], -e[2]); }
-  [[nodiscard]] T operator[](int i) const { return e[i]; }
-  [[nodiscard]] T &operator[](int i) { return e[i]; }
+  [[nodiscard]] T operator[](std::size_t i) const { return e[i]; }
+  [[nodiscard]] T &operator[](std::size_t i) { return e[i]; }
 
   Vector3 &operator+=(const Vector3 &v)
   {
-    e[0] += v.e[0];
-    e[1] += v.e[1];
-    e[2] += v.e[2];
+    e[0] += v[0];
+    e[1] += v[1];
+    e[2] += v[2];
     return *this;
   }
 
@@ -50,8 +51,8 @@ public:
 
   [[nodiscard]] T length_squared() const { return e[0] * e[0] + e[1] * e[1] + e[2] * e[2]; }
 
-public:
-  T e[3];
+private:
+  std::array<T, 3> e;
 };
 
 using Vector3f = Vector3<float>;
@@ -66,27 +67,27 @@ using Color = Vec3;// RGB color
 
 template<typename T> inline std::ostream &operator<<(std::ostream &out, const Vector3<T> &v)
 {
-  return out << v.e[0] << ' ' << v.e[1] << ' ' << v.e[2];
+  return out << v[0] << ' ' << v[1] << ' ' << v[2];
 }
 
 template<typename T> inline Vector3<T> operator+(const Vector3<T> &u, const Vector3<T> &v)
 {
-  return Vector3<T>(u.e[0] + v.e[0], u.e[1] + v.e[1], u.e[2] + v.e[2]);
+  return Vector3<T>(u[0] + v[0], u[1] + v[1], u[2] + v[2]);
 }
 
 template<typename T> inline Vector3<T> operator-(const Vector3<T> &u, const Vector3<T> &v)
 {
-  return Vector3<T>(u.e[0] - v.e[0], u.e[1] - v.e[1], u.e[2] - v.e[2]);
+  return Vector3<T>(u[0] - v[0], u[1] - v[1], u[2] - v[2]);
 }
 
 template<typename T> inline Vector3<T> operator*(const Vector3<T> &u, const Vector3<T> &v)
 {
-  return Vector3<T>(u.e[0] * v.e[0], u.e[1] * v.e[1], u.e[2] * v.e[2]);
+  return Vector3<T>(u[0] * v[0], u[1] * v[1], u[2] * v[2]);
 }
 
 template<typename T> inline Vector3<T> operator*(double t, const Vector3<T> &v)
 {
-  return Vector3<T>(t * v.e[0], t * v.e[1], t * v.e[2]);
+  return Vector3<T>(t * v[0], t * v[1], t * v[2]);
 }
 
 template<typename T> inline Vector3<T> operator*(const Vector3<T> &v, double t) { return t * v; }
@@ -95,13 +96,12 @@ template<typename T> inline Vector3<T> operator/(Vector3<T> v, double t) { retur
 
 template<typename T> inline double dot(const Vector3<T> &u, const Vector3<T> &v)
 {
-  return u.e[0] * v.e[0] + u.e[1] * v.e[1] + u.e[2] * v.e[2];
+  return u[0] * v[0] + u[1] * v[1] + u[2] * v[2];
 }
 
 template<typename T> inline Vector3<T> cross(const Vector3<T> &u, const Vector3<T> &v)
 {
-  return Vector3<T>(
-    u.e[1] * v.e[2] - u.e[2] * v.e[1], u.e[2] * v.e[0] - u.e[0] * v.e[2], u.e[0] * v.e[1] - u.e[1] * v.e[0]);
+  return Vector3<T>(u[1] * v[2] - u[2] * v[1], u[2] * v[0] - u[0] * v[2], u[0] * v[1] - u[1] * v[0]);
 }
 
 template<typename T> inline Vector3<T> unit_vector(Vector3<T> v) { return v / v.length(); }

@@ -8,7 +8,8 @@ namespace rtiaw {
 class Ray
 {
 public:
-  Ray() {}
+  Ray() = default;
+  // TODO(DBA): Strong-typed named arguments?
   Ray(const Point3 &origin, const Vec3 &direction) : orig(origin), dir(direction) {}
 
   [[nodiscard]] Point3 origin() const { return orig; }
