@@ -6,7 +6,7 @@
 
 namespace rtiaw {
 // Utility Functions
-inline FPType degrees_to_radians(double degrees) {
+inline FPType degrees_to_radians(FPType degrees) {
   return degrees * PI / 180.0; // NOLINT
 }
 

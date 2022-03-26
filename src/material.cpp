@@ -1,5 +1,6 @@
 #include "material.h"
 #include "hittable.h"
+#include "random.h"
 
 #include <optional>
 
@@ -40,7 +41,8 @@ std::optional<ScatteredRay> Dielectric::scatter(const Ray &r_in,
 
   Vec3 direction;
   bool cannot_refract = refraction_ratio * sin_theta > 1.0;
-  if (cannot_refract) {
+  if (cannot_refract ||
+      Dielectric::reflectance(cos_theta, refraction_ratio) > rand_fp()) {
     direction = reflect(unit_direction, rec.normal);
   } else {
     direction = refract(unit_direction, rec.normal, refraction_ratio);
