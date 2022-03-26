@@ -29,10 +29,14 @@ std::optional<HitRecord> Sphere::hit(const Ray &r, FPType t_min,
 
   auto p = r.at(root);
   auto outward_normal = (p - center) / radius;
-  auto hrec = HitRecord{.p = p, .t = root};
+  auto hrec = HitRecord{
+      .p = p,
+      .material = material,
+      .t = root,
+  };
   hrec.set_face_normal(r, outward_normal);
 
   return hrec;
 }
 
-}
+} // namespace rtiaw

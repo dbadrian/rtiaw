@@ -6,13 +6,17 @@
 #include "ray.h"
 #include "vector.h"
 
+#include <memory>
 #include <optional>
 
 namespace rtiaw {
 
+class Material;
+
 struct HitRecord {
   Point3 p;
   Vec3 normal;
+  std::shared_ptr<Material> material;
   FPType t;
   bool front_face;
 
