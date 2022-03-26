@@ -2,6 +2,7 @@
 #define Vector3_H
 
 #include "constant.h"
+#include "random.h"
 
 #include <array>
 #include <cmath>
@@ -47,6 +48,14 @@ public:
 
   [[nodiscard]] T length_squared() const {
     return e[0] * e[0] + e[1] * e[1] + e[2] * e[2];
+  }
+
+  [[nodiscard]] inline static Vector3 random() {
+    return Vector3(rand_fp(), rand_fp(), rand_fp());
+  }
+
+  [[nodiscard]] inline static Vector3 random(FPType min, FPType max) {
+    return Vector3(rand_fp(min, max), rand_fp(min, max), rand_fp(min, max));
   }
 
 private:
@@ -109,6 +118,16 @@ inline Vector3<T> cross(const Vector3<T> &u, const Vector3<T> &v) {
 
 template <typename T> inline Vector3<T> unit_vector(Vector3<T> v) {
   return v / v.length();
+}
+
+inline Vec3 random_in_unit_sphere() {
+  while (true) {
+    auto p = Vec3::random(-1.0, 1.0);
+    if (p.length_squared() >= 1) {
+      continue;
+    }
+    return p;
+  }
 }
 
 } // namespace rtiaw

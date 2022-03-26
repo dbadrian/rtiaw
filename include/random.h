@@ -22,6 +22,10 @@ inline FPType rand_fp() {
   return distribution(generator);
 }
 
+inline FPType rand_fp(FPType min, FPType max) {
+  return min + (max - min) * rand_fp();
+}
+
 } // namespace rtiaw
 
 #endif // RANDOM_H
