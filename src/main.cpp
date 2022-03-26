@@ -109,6 +109,7 @@ int main(int argc, char *argv[]) {
   for (int row = IMAGE_HEIGHT - 1; row >= 0; --row) {
     std::cerr << "\rScanlines remaining: " << row << ' ' << std::flush;
 
+#pragma omp parallel for
     for (int col = 0; col < IMAGE_WIDTH; ++col) {
       Color pixel_color(0, 0, 0);
       for (int s = 0; s < num_samples; ++s) {

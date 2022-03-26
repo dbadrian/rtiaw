@@ -14,7 +14,7 @@ project(
 cflags = [
     # '-flto',
     '-ffast-math',
-    # '-Ofast',
+    '-Ofast',
     '-march=native',
     '-mtune=native',
 ]
