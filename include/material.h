@@ -66,6 +66,17 @@ public:
   FPType fuzz;
 };
 
+class Dielectric : public Material {
+public:
+  Dielectric(double index_of_refraction) : ir(index_of_refraction) {}
+
+  [[nodiscard]] std::optional<ScatteredRay>
+  scatter(const Ray &r_in, const HitRecord &rec) const override;
+
+private:
+  double ir; // Index of Refraction
+};
+
 } // namespace rtiaw
 
 #endif // MATERIAL_H
