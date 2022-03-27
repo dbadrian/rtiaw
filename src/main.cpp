@@ -6,6 +6,7 @@
 #include "random.h"
 #include "sphere.h"
 
+#include <chrono>
 #include <iostream>
 #include <memory>
 #include <span>
@@ -106,6 +107,8 @@ int main(int argc, char *argv[]) {
 
   Image image;
 
+  auto begin = std::chrono::high_resolution_clock::now();
+
   for (int row = IMAGE_HEIGHT - 1; row >= 0; --row) {
     std::cerr << "\rScanlines remaining: " << row << ' ' << std::flush;
 
@@ -123,8 +126,13 @@ int main(int argc, char *argv[]) {
     }
   }
 
+  auto end = std::chrono::high_resolution_clock::now();
+  auto elapsed =
+      std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
   write_color(std::cout, image, num_samples);
 
+  std::cerr << "Time measured: " << elapsed.count() * 1e-9 << " seconds.\n"
+            << std::endl;
   // Finished succesfully
   return 0;
 }
