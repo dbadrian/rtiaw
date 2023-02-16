@@ -16,7 +16,7 @@ class Material;
 struct HitRecord {
   Point3 p;
   Vec3 normal;
-  std::shared_ptr<Material> material;
+  Material *material;
   FPType t;
   bool front_face;
 

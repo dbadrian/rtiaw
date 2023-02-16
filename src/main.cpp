@@ -35,8 +35,10 @@ Color ray_color(const Ray &r, const Hittable &world, int depth) {
 HittableList random_scene() {
   HittableList world;
 
-  auto ground_material = make_shared<Lambertian>(Color(0.5, 0.5, 0.5));
-  world.add(make_shared<Sphere>(Point3(0, -1000, 0), 1000, ground_material));
+  std::unique_ptr<Material> ground_material =
+      std::make_unique<Lambertian>(Color(0.5, 0.5, 0.5));
+  world.add(std::make_unique<Sphere>(Point3(0, -1000, 0), 1000,
+                                     std::move(ground_material)));
 
   for (int a = -11; a < 11; a++) {
     for (int b = -11; b < 11; b++) {
@@ -44,36 +46,42 @@ HittableList random_scene() {
       Point3 center(a + 0.9 * rand_fp(), 0.2, b + 0.9 * rand_fp());
 
       if ((center - Point3(4, 0.2, 0)).length() > 0.9) {
-        shared_ptr<Material> sphere_material;
+        std::unique_ptr<Material> sphere_material;
 
         if (choose_mat < 0.8) {
           // diffuse
           auto albedo = Color::random() * Color::random();
-          sphere_material = make_shared<Lambertian>(albedo);
-          world.add(make_shared<Sphere>(center, 0.2, sphere_material));
+          sphere_material = std::make_unique<Lambertian>(albedo);
+          world.add(std::make_unique<Sphere>(center, 0.2,
+                                             std::move(sphere_material)));
         } else if (choose_mat < 0.95) {
           // metal
           auto albedo = Color::random(0.5, 1);
           auto fuzz = rand_fp(0, 0.5);
-          sphere_material = make_shared<Metal>(albedo, fuzz);
-          world.add(make_shared<Sphere>(center, 0.2, sphere_material));
+          sphere_material = std::make_unique<Metal>(albedo, fuzz);
+          world.add(std::make_unique<Sphere>(center, 0.2,
+                                             std::move(sphere_material)));
         } else {
           // glass
-          sphere_material = make_shared<Dielectric>(1.5);
-          world.add(make_shared<Sphere>(center, 0.2, sphere_material));
+          sphere_material = std::make_unique<Dielectric>(1.5);
+          world.add(std::make_unique<Sphere>(center, 0.2,
+                                             std::move(sphere_material)));
         }
       }
     }
   }
 
-  auto material1 = make_shared<Dielectric>(1.5);
-  world.add(make_shared<Sphere>(Point3(0, 1, 0), 1.0, material1));
+  auto material1 = std::make_unique<Dielectric>(1.5);
+  world.add(
+      std::make_unique<Sphere>(Point3(0, 1, 0), 1.0, std::move(material1)));
 
-  auto material2 = make_shared<Lambertian>(Color(0.4, 0.2, 0.1));
-  world.add(make_shared<Sphere>(Point3(-4, 1, 0), 1.0, material2));
+  auto material2 = std::make_unique<Lambertian>(Color(0.4, 0.2, 0.1));
+  world.add(
+      std::make_unique<Sphere>(Point3(-4, 1, 0), 1.0, std::move(material2)));
 
-  auto material3 = make_shared<Metal>(Color(0.7, 0.6, 0.5), 0.0);
-  world.add(make_shared<Sphere>(Point3(4, 1, 0), 1.0, material3));
+  auto material3 = std::make_unique<Metal>(Color(0.7, 0.6, 0.5), 0.0);
+  world.add(
+      std::make_unique<Sphere>(Point3(4, 1, 0), 1.0, std::move(material3)));
 
   return world;
 }
@@ -109,10 +117,10 @@ int main(int argc, char *argv[]) {
 
   auto begin = std::chrono::high_resolution_clock::now();
 
-  for (int row = IMAGE_HEIGHT - 1; row >= 0; --row) {
-    std::cerr << "\rScanlines remaining: " << row << ' ' << std::flush;
-
 #pragma omp parallel for
+  for (int row = IMAGE_HEIGHT - 1; row >= 0; --row) {
+    // std::cerr << "\rScanlines remaining: " << row << ' ' << std::flush;
+
     for (int col = 0; col < IMAGE_WIDTH; ++col) {
       Color pixel_color(0, 0, 0);
       for (int s = 0; s < num_samples; ++s) {

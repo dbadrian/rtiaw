@@ -8,21 +8,18 @@
 #include <optional>
 #include <vector>
 
-using std::make_shared;
-using std::shared_ptr; // TODO: Really shared_ptr? uff...costly...
+using std::unique_ptr; // TODO: Really unique_ptr? uff...costly...
 
 namespace rtiaw {
 class HittableList : public Hittable {
 public:
   HittableList() = default;
-  // explicit HittableList(shared_ptr<Hittable> object) { add(object); }
-  explicit HittableList(shared_ptr<Hittable> &&object) {
-    add(std::move(object));
-  }
+  // explicit HittableList(unique_ptr<Hittable> object) { add(object); }
+  explicit HittableList(unique_ptr<Hittable> object) { add(std::move(object)); }
 
   void clear() { objects.clear(); }
-  // void add(shared_ptr<Hittable> object) { objects.push_back(object); }
-  void add(shared_ptr<Hittable> &&object) {
+  // void add(unique_ptr<Hittable> object) { objects.push_back(object); }
+  void add(unique_ptr<Hittable> object) {
     objects.emplace_back(std::move(object));
   }
 
@@ -30,7 +27,7 @@ public:
   hit(const Ray &r, FPType t_min, FPType t_max) const override; // NOLINT
 
 private:
-  std::vector<shared_ptr<Hittable>> objects;
+  std::vector<unique_ptr<Hittable>> objects;
 };
 
 std::optional<HitRecord> HittableList::hit(const Ray &r, FPType t_min,

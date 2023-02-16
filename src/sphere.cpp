@@ -31,7 +31,7 @@ std::optional<HitRecord> Sphere::hit(const Ray &r, FPType t_min,
   auto outward_normal = (p - center) / radius;
   auto hrec = HitRecord{
       .p = p,
-      .material = material,
+      .material = material.get(),
       .t = root,
   };
   hrec.set_face_normal(r, outward_normal);
